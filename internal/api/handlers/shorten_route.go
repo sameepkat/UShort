@@ -45,7 +45,7 @@ func Shorten(c *gin.Context, urlService *service.URLService) {
 	c.JSON(http.StatusOK, ShortenResponse{
 		ShortURL:    shortURL,
 		OriginalURL: url.OriginalURL,
-		ExpiresAt:   url.ExpiresAt,
+		ExpiresAt:   &url.ExpiresAt,
 	})
 
 }
