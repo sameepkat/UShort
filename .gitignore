@@ -6,6 +6,7 @@
 *.dylib
 bin/
 temp.md
+__*
 
 # Test binary, built with `go test -c`
 *.test
@@ -36,4 +37,4 @@ Thumbs.db
 *.log
 
 # Docker volumes
-docker/volumes/ 
+docker/volumes/

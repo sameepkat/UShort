@@ -5,6 +5,7 @@ import (
 	"log"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/sameepkat/ushort/internal/database"
 	"github.com/sameepkat/ushort/internal/models"
@@ -44,7 +45,7 @@ func TestConcurrentURLCreation(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			url, err := test_service.CreateShortURL(context.Background(), "https://example.com", nil, nil)
+			url, err := test_service.CreateShortURL(context.Background(), "https://example.com", nil, time.Now().Add(1*time.Hour))
 			if err != nil {
 				errors <- err
 			}

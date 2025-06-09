@@ -42,7 +42,7 @@ func NewURLService(db *gorm.DB, redisURL string) (*URLService, error) {
 	}, nil
 }
 
-func (s *URLService) CreateShortURL(ctx context.Context, originalURL string, userID *uint64, expiresAt *time.Time) (*models.URL, error) {
+func (s *URLService) CreateShortURL(ctx context.Context, originalURL string, userID *uint64, expiresAt time.Time) (*models.URL, error) {
 	if !s.rateLimiter.Allow(userID) {
 		return nil, ErrRateLimitExceeded
 	}
@@ -67,8 +67,8 @@ func (s *URLService) CreateShortURL(ctx context.Context, originalURL string, use
 		CreatedAt:   time.Now(),
 	}
 
-	if expiresAt != nil {
-		url.ExpiresAt = *expiresAt
+	if !expiresAt.IsZero() {
+		url.ExpiresAt = expiresAt
 	}
 
 	if err := tx.Create(url).Error; err != nil {
@@ -98,22 +98,26 @@ func (s *URLService) GetOriginalURL(ctx context.Context, shortCode string) (*mod
 	if url, err := s.cache.Get(ctx, shortCode); err != nil {
 		return nil, err
 	} else if url != nil {
+		log.Println("From redis cache")
 		return url, nil
 	}
 	var url models.URL
-	id, err := encoding.Decode(shortCode)
-	if err != nil {
-		return nil, ErrInvalidURL
-	}
+	// id, err := encoding.Decode(shortCode)
+	// if err != nil {
+	// 	return nil, ErrInvalidURL
+	// }
 
-	if err := s.db.First(&url, id).Error; err != nil {
+	if err := s.db.First(&url, shortCode).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Println("Not found gorm")
 			return nil, ErrURLNotFound
 		}
+		log.Println("Not found db err")
 		return nil, err
 	}
 
 	if !url.ExpiresAt.IsZero() && url.ExpiresAt.Before(time.Now()) {
+		log.Println("Expired")
 		return nil, ErrURLNotFound
 	}
 

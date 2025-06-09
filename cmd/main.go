@@ -32,11 +32,12 @@ func main() {
 
 	router := gin.Default()
 
-	routes.InitRoutes(router, urlService)
-
-	if err := router.Run(":8080"); err != nil {
-		log.Fatal(err)
+	root := router.Group("/")
+	{
+		routes.SetupRoutes(root, urlService)
 	}
+
+	router.Run(":8080")
 }
 
 func getEnv(key, defaultValue string) string {
