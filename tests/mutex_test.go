@@ -3,6 +3,7 @@ package tests
 import (
 	"context"
 	"log"
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -12,16 +13,22 @@ import (
 	"github.com/sameepkat/ushort/internal/service"
 )
 
+func getEnv(key, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
+}
 func TestConcurrentURLCreation(t *testing.T) {
 	redisURL := "redis://localhost:6379/0"
 
 	config := database.Config{
-		Host:     "localhost",
-		Port:     "3307",
-		User:     "admin",
-		Password: "admin",
-		DBName:   "urls",
-		SSLMode:  "false",
+		Host:     getEnv("DB_HOST", "localhost"),
+		Port:     getEnv("DB_PORT", "5432"),
+		User:     getEnv("DB_USER", "ushort"),
+		Password: getEnv("DB_PASSWORD", "randompassword"),
+		DBName:   getEnv("DB_NAME", "ushort"),
+		SSLMode:  getEnv("DB_SSLMODE", "disable"),
 	}
 	db, err := database.NewDB(config)
 	if err != nil {
@@ -43,11 +50,12 @@ func TestConcurrentURLCreation(t *testing.T) {
 	// Create 10 URLs concurrently
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		go func() {
+		func() {
 			defer wg.Done()
-			url, err := test_service.CreateShortURL(context.Background(), "https://example.com", nil, time.Now().Add(1*time.Hour))
+			url, err := test_service.CreateShortURL(context.Background(), "https://google.com", nil, time.Now().Add(1*time.Hour))
 			if err != nil {
 				errors <- err
+				return
 			}
 			urls <- url
 		}()
