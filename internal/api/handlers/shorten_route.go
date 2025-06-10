@@ -22,8 +22,15 @@ type ShortenResponse struct {
 
 func Shorten(c *gin.Context, urlService *service.URLService) {
 	var req ShortenRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid  request body"})
+	raw, exists := c.Get("sanitizedURL")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+	req, ok := raw.(ShortenRequest)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid request type"})
+		return
 	}
 
 	url, err := urlService.CreateShortURL(c.Request.Context(), req.URL, nil, req.ExpiresAt)
