@@ -30,11 +30,13 @@ func main() {
 	}
 	defer urlService.Close()
 
+	userService := service.NewUserService(db)
+
 	router := gin.Default()
 
 	root := router.Group("/")
 	{
-		routes.SetupRoutes(root, urlService)
+		routes.SetupRoutes(root, urlService, userService)
 	}
 
 	router.Run(":8080")

@@ -3,7 +3,7 @@ package tests
 import (
 	"context"
 	"log"
-	"os"
+	"os"					
 	"sync"
 	"testing"
 	"time"
@@ -50,7 +50,7 @@ func TestConcurrentURLCreation(t *testing.T) {
 	// Create 10 URLs concurrently
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		func() {
+		go func() {
 			defer wg.Done()
 			url, err := test_service.CreateShortURL(context.Background(), "https://google.com", nil, time.Now().Add(1*time.Hour))
 			if err != nil {
@@ -65,7 +65,7 @@ func TestConcurrentURLCreation(t *testing.T) {
 	close(urls)
 	close(errors)
 
-	for url := range urls {
+for url := range urls {
 		if url.ShortCode == "" {
 			t.Error("Empty Short Code generated")
 		}
@@ -74,4 +74,7 @@ func TestConcurrentURLCreation(t *testing.T) {
 	for err := range errors {
 		t.Errorf("Error creating URL: %v", err)
 	}
+
 }
+
+
