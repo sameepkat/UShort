@@ -43,7 +43,7 @@ func (s *UserService) Authenticate(ctx context.Context, email, password string) 
 
 func (s *UserService) CreateUser(ctx context.Context, email, password string) (*models.User, error) {
 	var existing models.User
-	if err := s.db.WithContext(ctx).Where("email = ?", email).First(&existing).Error; err != nil {
+	if err := s.db.WithContext(ctx).Where("email = ?", email).First(&existing).Error; err == nil {
 		return nil, ErrEmailExists
 	}
 

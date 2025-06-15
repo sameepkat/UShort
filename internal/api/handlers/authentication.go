@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -16,7 +15,6 @@ var jwtKey = []byte("asupersecretkey")
 
 func LoginHandler(userService *service.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Println("Inside login")
 
 		var input struct {
 			Email    string `json:"email"`

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +8,6 @@ import (
 )
 
 func IsAuthorized(c *gin.Context) {
-	log.Println("Inside isAuthorized")
 	cookie, err := c.Cookie("token")
 
 	if err != nil {

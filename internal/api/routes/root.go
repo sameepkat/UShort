@@ -10,6 +10,6 @@ import (
 func SetupRoutes(c *gin.RouterGroup, urlService *service.URLService, userService *service.UserService) {
 	c.POST("/shorten", middleware.UrlSanitizer, func(c *gin.Context) { handlers.Shorten(c, urlService) })
 	c.GET("/:short_url", func(c *gin.Context) { handlers.GetURL(c, urlService) })
-	c.POST("/login", middleware.IsAuthorized, handlers.LoginHandler(userService))
-	c.POST("/register", handlers.LoginHandler(userService))
+	c.POST("/login", handlers.LoginHandler(userService))
+	c.POST("/register", handlers.SignupHandler(userService))
 }
