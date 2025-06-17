@@ -102,17 +102,13 @@ func (s *URLService) GetOriginalURL(ctx context.Context, shortCode string) (*mod
 		return url, nil
 	}
 	var url models.URL
-	// id, err := encoding.Decode(shortCode)
-	// if err != nil {
-	// 	return nil, ErrInvalidURL
-	// }
 
-	if err := s.db.First(&url, shortCode).Error; err != nil {
+	if err := s.db.Where("short_code = ?", shortCode).First(&url).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Println("Not found gorm")
+			log.Println("Not found gorm shortCode")
 			return nil, ErrURLNotFound
 		}
-		log.Println("Not found db err")
+		log.Println("Not found db shortCode", err)
 		return nil, err
 	}
 

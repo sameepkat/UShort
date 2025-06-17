@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -51,7 +52,8 @@ func LoginHandler(userService *service.UserService) gin.HandlerFunc {
 			return
 		}
 
-		c.SetCookie("token", tokenString, int(expirationTime.Unix()), "/", c.Request.Host, false, true)
+		c.SetCookie("token", tokenString, int(expirationTime.Unix()), "/", "", false, false)
+		log.Println("TokenString: " + tokenString)
 		c.JSON(http.StatusOK, gin.H{"message": "user logged in"})
 	}
 }

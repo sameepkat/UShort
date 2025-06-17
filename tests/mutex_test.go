@@ -3,7 +3,7 @@ package tests
 import (
 	"context"
 	"log"
-	"os"					
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -65,7 +65,7 @@ func TestConcurrentURLCreation(t *testing.T) {
 	close(urls)
 	close(errors)
 
-for url := range urls {
+	for url := range urls {
 		if url.ShortCode == "" {
 			t.Error("Empty Short Code generated")
 		}
@@ -76,5 +76,3 @@ for url := range urls {
 	}
 
 }
-
-
