@@ -10,8 +10,9 @@ import (
 )
 
 type ShortenRequest struct {
-	URL       string    `json:"url" binding:"required"`
-	ExpiresAt time.Time `json:"expires_at"`
+	URL        string    `json:"url" binding:"required"`
+	ExpiresAt  time.Time `json:"expires_at,omitempty"`
+	CustomCode string    `json:"custom_code,omitempty"`
 }
 
 type ShortenResponse struct {
@@ -34,12 +35,14 @@ func Shorten(urlService *service.URLService) gin.HandlerFunc {
 			return
 		}
 
-		url, err := urlService.CreateShortURL(c.Request.Context(), req.URL, nil, req.ExpiresAt)
+		url, err := urlService.CreateShortURL(c.Request.Context(), req.URL, nil, req.CustomCode, req.ExpiresAt)
 		if err != nil {
-			switch err {
-			case service.ErrRateLimitExceeded:
+			switch {
+			case err.Error() == "custom code already in use":
+				c.JSON(http.StatusConflict, gin.H{"error": "Custom code already in use"})
+			case err == service.ErrRateLimitExceeded:
 				c.JSON(http.StatusTooManyRequests, gin.H{"error": err.Error()})
-			case service.ErrInvalidURL:
+			case err == service.ErrInvalidURL:
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid URL provided"})
 			default:
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create short URL"})

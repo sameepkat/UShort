@@ -42,13 +42,20 @@ func NewURLService(db *gorm.DB, redisURL string) (*URLService, error) {
 	}, nil
 }
 
-func (s *URLService) CreateShortURL(ctx context.Context, originalURL string, userID *uint64, expiresAt time.Time) (*models.URL, error) {
+func (s *URLService) CreateShortURL(ctx context.Context, originalURL string, userID *uint64, customCode string, expiresAt time.Time) (*models.URL, error) {
 	if !s.rateLimiter.Allow(userID) {
 		return nil, ErrRateLimitExceeded
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
+	if customCode != "" {
+		var existingURL models.URL
+		if err := s.db.Where("short_code = ? ", customCode).First(&existingURL).Error; err == nil {
+			return nil, errors.New("custom code already in use")
+		}
+	}
 
 	tx := s.db.Begin()
 	if tx.Error != nil {
@@ -76,7 +83,11 @@ func (s *URLService) CreateShortURL(ctx context.Context, originalURL string, use
 		return nil, err
 	}
 
-	url.ShortCode = encoding.Encode(url.ID)
+	if customCode != "" {
+		url.ShortCode = customCode
+	} else {
+		url.ShortCode = encoding.Encode(url.ID)
+	}
 
 	if err := tx.Save(url).Error; err != nil {
 		tx.Rollback()
