@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	gin.SetMode(gin.ReleaseMode)
 	config := database.Config{
 		Host:     getEnv("DB_HOST", "localhost"),
 		Port:     getEnv("DB_PORT", "5432"),

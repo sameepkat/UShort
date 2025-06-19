@@ -52,7 +52,7 @@ func TestConcurrentURLCreation(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			url, err := test_service.CreateShortURL(context.Background(), "https://google.com", nil, time.Now().Add(1*time.Hour))
+			url, err := test_service.CreateShortURL(context.Background(), "https://google.com", nil, "google", time.Now().Add(1*time.Hour))
 			if err != nil {
 				errors <- err
 				return
