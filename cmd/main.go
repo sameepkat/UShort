@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sameepkat/ushort/internal/api/routes"
 	"github.com/sameepkat/ushort/internal/database"
@@ -11,7 +12,8 @@ import (
 )
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
+	// Enable this in release mode
+	// gin.SetMode(gin.ReleaseMode)
 	config := database.Config{
 		Host:     getEnv("DB_HOST", "localhost"),
 		Port:     getEnv("DB_PORT", "5432"),
@@ -34,6 +36,13 @@ func main() {
 	userService := service.NewUserService(db)
 
 	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	root := router.Group("/")
 	{

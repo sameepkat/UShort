@@ -12,7 +12,7 @@ type URLResonse struct {
 	OriginalURL string `json:"original_url"`
 }
 
-func GetURL(urlService *service.URLService) gin.HandlerFunc {
+func GetURLInfo(urlService *service.URLService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		short_code := c.Param("short_url")
@@ -28,5 +28,22 @@ func GetURL(urlService *service.URLService) gin.HandlerFunc {
 			ShortURL:    url.ShortCode,
 			OriginalURL: url.OriginalURL,
 		})
+	}
+}
+
+func GetURL(urlService *service.URLService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		short_code := c.Param("short_url")
+
+		url, err := urlService.GetOriginalURL(c, short_code)
+
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.Redirect(http.StatusFound, url.OriginalURL)
+
 	}
 }

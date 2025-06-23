@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/sameepkat/ushort/internal/models"
 	"golang.org/x/crypto/bcrypt"
@@ -27,7 +26,6 @@ func NewUserService(db *gorm.DB) *UserService {
 
 func (s *UserService) Authenticate(ctx context.Context, email, password string) (*models.User, error) {
 	var user models.User
-	fmt.Printf("Email: %v\nPassword: %v\n", email, password)
 	if err := s.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, ErrInvalidCredential

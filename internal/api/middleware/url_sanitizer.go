@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
@@ -12,7 +11,6 @@ import (
 func UrlSanitizer(c *gin.Context) {
 	var req handlers.ShortenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Println(req)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body in middleware"})
 		c.Abort()
 		return

@@ -24,6 +24,8 @@ func IsAuthorized(c *gin.Context) {
 		return
 	}
 
+	c.Set("UserID", claims.UserID)
+
 	c.Set("role", claims.Role)
 	c.Next()
 }

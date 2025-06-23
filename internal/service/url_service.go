@@ -109,22 +109,18 @@ func (s *URLService) GetOriginalURL(ctx context.Context, shortCode string) (*mod
 	if url, err := s.cache.Get(ctx, shortCode); err != nil {
 		return nil, err
 	} else if url != nil {
-		log.Println("From redis cache")
 		return url, nil
 	}
 	var url models.URL
 
 	if err := s.db.Where("short_code = ?", shortCode).First(&url).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Println("Not found gorm shortCode")
 			return nil, ErrURLNotFound
 		}
-		log.Println("Not found db shortCode", err)
 		return nil, err
 	}
 
 	if !url.ExpiresAt.IsZero() && url.ExpiresAt.Before(time.Now()) {
-		log.Println("Expired")
 		return nil, ErrURLNotFound
 	}
 

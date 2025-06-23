@@ -29,13 +29,22 @@ func Shorten(urlService *service.URLService) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 			return
 		}
+
+		userIdValue, exists := c.Get("UserID")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "can't find user id"})
+			return
+		}
+
+		userId := userIdValue.(uint)
+
 		req, ok := raw.(ShortenRequest)
 		if !ok {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid request type"})
 			return
 		}
 
-		url, err := urlService.CreateShortURL(c.Request.Context(), req.URL, nil, req.CustomCode, req.ExpiresAt)
+		url, err := urlService.CreateShortURL(c.Request.Context(), req.URL, func() *uint64 { v := uint64(userId); return &v }(), req.CustomCode, req.ExpiresAt)
 		if err != nil {
 			switch {
 			case err.Error() == "custom code already in use":

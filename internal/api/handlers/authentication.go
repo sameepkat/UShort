@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -35,7 +34,8 @@ func LoginHandler(userService *service.UserService) gin.HandlerFunc {
 
 		expirationTime := time.Now().Add(5 * time.Minute)
 		claims := models.Claims{
-			Role: user.Email,
+			UserID: user.ID,
+			Role:   user.Email,
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(expirationTime),
 				IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -53,7 +53,6 @@ func LoginHandler(userService *service.UserService) gin.HandlerFunc {
 		}
 
 		c.SetCookie("token", tokenString, int(expirationTime.Unix()), "/", "", false, false)
-		log.Println("TokenString: " + tokenString)
 		c.JSON(http.StatusOK, gin.H{"message": "user logged in"})
 	}
 }
