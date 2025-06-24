@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -35,7 +36,9 @@ func LoginHandler(userService *service.UserService) gin.HandlerFunc {
 		expirationTime := time.Now().Add(5 * time.Minute)
 		claims := models.Claims{
 			UserID: user.ID,
-			Role:   user.Email,
+			Name:   user.Name,
+			Email:  user.Email,
+			Role:   user.Role,
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(expirationTime),
 				IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -86,6 +89,7 @@ func Continue(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		log.Println("cookie err")
 		return
 	}
 
@@ -93,14 +97,22 @@ func Continue(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		log.Println("parsetoken err")
 		return
 	}
 
 	if claims.Role != "user" && claims.Role != "admin" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		log.Println("Claim.role = ", claims.Role)
+		log.Printf("%s vs %s\n", claims.Role, "user")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": "continue", "role": claims.Role})
+	c.JSON(http.StatusOK, gin.H{"success": true, "user": gin.H{
+		"name":  claims.Name,
+		"email": claims.Email,
+		"role":  claims.Role,
+	},
+	})
 
 }
