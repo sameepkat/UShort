@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -13,14 +15,27 @@ import (
 
 func main() {
 	// Enable this in release mode
-	// gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
+
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		log.Fatal("Database URL not set")
+	}
+
+	u, err := url.Parse(databaseURL)
+	if err != nil {
+		log.Fatalf("Invalid DATABASE_URL: %v", err)
+	}
+	userInfo := u.User
+	password, _ := userInfo.Password()
+
 	config := database.Config{
-		Host:     getEnv("DB_HOST", "localhost"),
-		Port:     getEnv("DB_PORT", "5432"),
-		User:     getEnv("DB_USER", "ushort"),
-		Password: getEnv("DB_PASSWORD", "randompassword"),
-		DBName:   getEnv("DB_NAME", "ushort"),
-		SSLMode:  getEnv("DB_SSLMODE", "disable"),
+		Host:     u.Hostname(),
+		Port:     u.Port(),
+		User:     userInfo.Username(),
+		Password: password,
+		DBName:   strings.TrimPrefix(u.Path, "/"),
+		SSLMode:  u.Query().Get("sslmode"),
 	}
 	redisURL := getEnv("REDIS_URL", "redis://localhost:6379/0")
 	db, err := database.NewDB(config)
