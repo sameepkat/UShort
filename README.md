@@ -1,6 +1,6 @@
 # UShort - URL Shortening Service
 
-A high-performance URL shortening service built with Go, featuring rate limiting, authentication, and monitoring capabilities.
+A high-performance URL shortening service built with Go, featuring rate limiting and authentication.
 
 ## Features
 
