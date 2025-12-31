@@ -1,6 +1,6 @@
 # UShort - URL Shortening Service
 
-A high-performance URL shortening service built with Go, featuring rate limiting, authentication, and monitoring capabilities.
+A high-performance URL shortening service built with Go, featuring rate limiting and authentication.
 
 ## Features
 
@@ -10,7 +10,6 @@ A high-performance URL shortening service built with Go, featuring rate limiting
 - Redis caching for improved performance
 - PostgreSQL database with optimized indexing
 - Swagger API documentation
-- Monitoring with Grafana
 - Docker multi-container setup
 - CI/CD pipeline ready
 
@@ -20,7 +19,6 @@ A high-performance URL shortening service built with Go, featuring rate limiting
 - Database: PostgreSQL
 - Cache: Redis
 - Container: Docker
-- Monitoring: Grafana
 - API Documentation: Swagger
 - Testing: Go testing framework
 
